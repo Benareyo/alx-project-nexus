@@ -104,7 +104,7 @@ During the first week, we aligned with frontend learners working on the same pro
 
 ## 📦 Submission
 
-- **GitHub Repository**: [`alx-project-nexus`](https://github.com/YOUR_USERNAME/alx-project-nexus)
+- **GitHub Repository**: [`alx-project-nexus`](https://github.com/Benareyo/alx-project-nexus)
 - **Deliverables**:
   - `README.md` – Project documentation (this file)
   - Project proposal documentation
