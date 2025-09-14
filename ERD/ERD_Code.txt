@@ -1,0 +1,104 @@
+Table users {
+  id int [pk, increment]
+  username varchar
+  email varchar
+  password varchar
+  role varchar
+}
+
+Table designers {
+  id int [pk, increment]
+  name varchar
+  bio text
+  contact_info varchar
+}
+
+Table collections {
+  id int [pk, increment]
+  name varchar
+  description text
+}
+
+Table dresses {
+  id int [pk, increment]
+  name varchar
+  designer_id int [ref: > designers.id]  // one designer -> many dresses
+  collection_id int [ref: > collections.id] // one collection -> many dresses
+  price decimal
+  description text
+  size varchar
+  stock int
+}
+
+Table fashion_shows {
+  id int [pk, increment]
+  collection_id int [ref: > collections.id]  // one collection -> many shows
+  title varchar
+  designer_id int [ref: > designers.id]
+  scheduled_at timestamp
+}
+
+Table virtual_tryons {
+  id int [pk, increment]
+  user_id int [ref: > users.id]  // one user -> many virtual try-ons
+  dress_id int [ref: > dresses.id]  // one dress -> many try-ons
+  photo_url varchar
+  created_at timestamp
+}
+
+Table carts {
+  id int [pk, increment]
+  user_id int [ref: > users.id]  // one user -> one cart (1:1)
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table cart_items {
+  id int [pk, increment]
+  cart_id int [ref: > carts.id]  // one cart -> many cart items (1:M)
+  dress_id int [ref: > dresses.id]  // one dress can appear in many cart items
+  quantity int
+}
+
+Table orders {
+  id int [pk, increment]
+  user_id int [ref: > users.id]  // one user -> many orders
+  total_amount decimal
+  status varchar
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table order_items {
+  id int [pk, increment]
+  order_id int [ref: > orders.id]  // one order -> many order items
+  dress_id int [ref: > dresses.id]
+  quantity int
+  price decimal
+}
+
+Table reviews {
+  id int [pk, increment]
+  user_id int [ref: > users.id]  // one user -> many reviews
+  dress_id int [ref: > dresses.id]  // one dress -> many reviews
+  rating int
+  comment text
+  created_at timestamp
+}
+
+Table appointments {
+  id int [pk, increment]
+  user_id int [ref: > users.id]  // one user -> many appointments
+  dress_id int [ref: > dresses.id]
+  date_time timestamp
+  status varchar
+}
+
+Table payments {
+  id int [pk, increment]
+  order_id int [ref: > orders.id]  // one order -> one payment (1:1)
+  payment_method varchar
+  amount decimal
+  status varchar
+  created_at timestamp
+}
