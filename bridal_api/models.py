@@ -1,15 +1,17 @@
-
+# bridal_api/models.py
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-# ✅ User model (extend Django's built-in user)
+# -------------------------
+# Custom user (extends Django)
+# -------------------------
 class User(AbstractUser):
     ROLE_CHOICES = [
-        ('customer', 'Customer'),
-        ('designer', 'Designer'),
-        ('admin', 'Admin'),
+        ("customer", "Customer"),
+        ("designer", "Designer"),
+        ("admin", "Admin"),
     ]
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='customer')
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="customer")
     phone = models.CharField(max_length=20, blank=True, null=True)
     address = models.TextField(blank=True, null=True)
 
@@ -17,48 +19,67 @@ class User(AbstractUser):
         return self.username
 
 
-# ✅ Designer (linked to User if role=designer)
+# -------------------------
+# Designer
+# Use string model references ('bridal_api.User') to avoid import-order issues
+# -------------------------
 class Designer(models.Model):
-    user = models.OneToOneField('User', on_delete=models.CASCADE, related_name='designer_profile')
-    # make name nullable to avoid one-off default migration prompts
+    user = models.OneToOneField(
+        "bridal_api.User", on_delete=models.CASCADE, related_name="designer_profile"
+    )
     name = models.CharField(max_length=100, blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
 
     def __str__(self):
-        return self.name if self.name else (self.user.username if self.user else "Designer")
+        return self.name if self.name else self.user.username
 
 
-
-# ✅ Collection (group of dresses by designer)
+# -------------------------
+# Collection
+# -------------------------
 class Collection(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
-    designer = models.ForeignKey(Designer, on_delete=models.CASCADE, related_name="collections")
+    designer = models.ForeignKey(
+        "bridal_api.Designer", on_delete=models.CASCADE, related_name="collections"
+    )
 
     def __str__(self):
-        return f"{self.name} ({self.designer.user.username})"
+        # safe string formatting: if designer or user missing, still readable
+        designer_username = getattr(self.designer.user, "username", "unknown")
+        return f"{self.name} ({designer_username})"
 
 
-# ✅ Dress
+# -------------------------
+# Dress
+# -------------------------
 class Dress(models.Model):
     name = models.CharField(max_length=100)
-    designer = models.ForeignKey(Designer, on_delete=models.CASCADE, related_name="dresses")
-    collection = models.ForeignKey(Collection, on_delete=models.SET_NULL, null=True, blank=True, related_name="dresses")
+    designer = models.ForeignKey(
+        "bridal_api.Designer", on_delete=models.CASCADE, related_name="dresses"
+    )
+    collection = models.ForeignKey(
+        Collection, on_delete=models.SET_NULL, null=True, blank=True, related_name="dresses"
+    )
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField(blank=True, null=True)
     size = models.CharField(max_length=20)
     stock = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f"{self.name} - {self.designer.user.username}"
+        designer_username = getattr(self.designer.user, "username", "unknown")
+        return f"{self.name} - {designer_username}"
 
 
-# ✅ Cart
+# -------------------------
+# Cart and CartItem
+# -------------------------
 class Cart(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="cart")
+    user = models.OneToOneField("bridal_api.User", on_delete=models.CASCADE, related_name="cart")
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Cart of {self.user.username}"
@@ -73,17 +94,20 @@ class CartItem(models.Model):
         return f"{self.dress.name} x{self.quantity}"
 
 
-# ✅ Order
+# -------------------------
+# Orders & OrderItem
+# -------------------------
 class Order(models.Model):
     STATUS_CHOICES = [
-        ('pending', 'Pending'),
-        ('paid', 'Paid'),
-        ('shipped', 'Shipped'),
-        ('delivered', 'Delivered'),
-        ('cancelled', 'Cancelled'),
+        ("pending", "Pending"),
+        ("paid", "Paid"),
+        ("shipped", "Shipped"),
+        ("delivered", "Delivered"),
+        ("cancelled", "Cancelled"),
     ]
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="orders")
+    user = models.ForeignKey("bridal_api.User", on_delete=models.CASCADE, related_name="orders")
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
@@ -101,13 +125,11 @@ class OrderItem(models.Model):
         return f"{self.dress.name} x{self.quantity} (Order {self.order.id})"
 
 
-# ✅ Payment
+# -------------------------
+# Payment
+# -------------------------
 class Payment(models.Model):
-    METHOD_CHOICES = [
-        ('card', 'Card'),
-        ('paypal', 'PayPal'),
-        ('cash', 'Cash on Delivery'),
-    ]
+    METHOD_CHOICES = [("card", "Card"), ("paypal", "PayPal"), ("cash", "Cash on Delivery")]
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="payment")
     method = models.CharField(max_length=20, choices=METHOD_CHOICES)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
@@ -117,10 +139,12 @@ class Payment(models.Model):
         return f"Payment for Order {self.order.id}"
 
 
-# ✅ Appointment (for trying dresses in person)
+# -------------------------
+# Appointment
+# -------------------------
 class Appointment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="appointments")
-    designer = models.ForeignKey(Designer, on_delete=models.CASCADE, related_name="appointments")
+    user = models.ForeignKey("bridal_api.User", on_delete=models.CASCADE, related_name="appointments")
+    designer = models.ForeignKey("bridal_api.Designer", on_delete=models.CASCADE, related_name="appointments")
     date = models.DateTimeField()
     notes = models.TextField(blank=True, null=True)
 
@@ -128,9 +152,11 @@ class Appointment(models.Model):
         return f"Appointment: {self.user.username} with {self.designer.user.username}"
 
 
-# ✅ Review (customers leave reviews on dresses)
+# -------------------------
+# Review
+# -------------------------
 class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reviews")
+    user = models.ForeignKey("bridal_api.User", on_delete=models.CASCADE, related_name="reviews")
     dress = models.ForeignKey(Dress, on_delete=models.CASCADE, related_name="reviews")
     rating = models.PositiveIntegerField(default=5)
     comment = models.TextField(blank=True, null=True)
@@ -138,4 +164,3 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review by {self.user.username} on {self.dress.name}"
-
