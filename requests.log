@@ -1,0 +1,140 @@
+2025-09-22 12:29:25.363415 - User: Anonymous - Path: /api/designers/
+2025-09-22 12:30:01.787325 - User: Anonymous - Path: /api/designers/
+2025-09-22 12:30:20.243079 - User: Anonymous - Path: /api/token/
+2025-09-22 12:30:55.463513 - User: Anonymous - Path: /api/token/
+2025-09-22 12:31:15.764273 - User: Anonymous - Path: /api/designers/
+2025-09-22 12:36:20.063871 - User: Anonymous - Path: /api/designers/
+2025-09-22 12:36:37.997459 - User: Anonymous - Path: /api/token/
+2025-09-22 12:37:19.023737 - User: Anonymous - Path: /api/token/
+2025-09-22 12:37:48.072397 - User: Anonymous - Path: /api/designers/
+2025-09-22 12:37:59.513443 - User: Anonymous - Path: /api/designers/
+2025-09-22 12:41:27.920206 - User: Anonymous - Path: /api/token/
+2025-09-22 12:42:12.013704 - User: Anonymous - Path: /api/token/
+2025-09-22 12:42:56.476605 - User: Anonymous - Path: /api/designers/
+2025-09-22 20:24:36.318106 - User:  - Method: GET - Path: /api/designers/
+2025-09-22 20:24:41.965515 - User:  - Method: GET - Path: /api/designers/
+2025-09-22 20:30:15.458100 - User:  - Method: POST - Path: /api/token/
+2025-09-22 20:31:03.259366 - User:  - Method: POST - Path: /api/token/
+2025-09-22 20:31:34.487538 - User:  - Method: POST - Path: /api/designers/
+2025-09-22 20:32:11.245539 - User:  - Method: POST - Path: /api/designers/
+2025-09-22 20:32:31.321471 - User:  - Method: POST - Path: /api/designers/
+2025-09-22 20:34:23.295749 - User:  - Method: POST - Path: /api/designers/
+2025-09-22 20:34:39.320306 - User:  - Method: POST - Path: /api/designers/
+2025-09-22 20:36:06.225305 - User:  - Method: POST - Path: /api/designers/
+2025-09-22 20:43:35.211058 - User:  - Method: POST - Path: /api/register/
+2025-09-22 20:44:59.474666 - User:  - Method: POST - Path: /api/register/
+2025-09-22 20:50:03.020230 - User:  - Method: POST - Path: /api/register/
+2025-09-22 20:50:42.023728 - User:  - Method: POST - Path: /api/register/
+2025-09-22 20:55:20.280001 - User:  - Method: POST - Path: /api/register/
+2025-09-22 20:56:11.682133 - User:  - Method: POST - Path: /api/token/
+2025-09-22 20:56:53.782553 - User:  - Method: POST - Path: /api/token/
+2025-09-22 20:57:14.093103 - User:  - Method: POST - Path: /api/designers/
+2025-09-22 20:58:28.813473 - User:  - Method: POST - Path: /api/designers/
+2025-09-22 21:00:05.098025 - User:  - Method: POST - Path: /api/token/
+2025-09-22 21:00:38.575932 - User:  - Method: POST - Path: /api/token/
+2025-09-22 21:01:25.529297 - User:  - Method: POST - Path: /api/designers/
+2025-09-22 21:04:43.581606 - User:  - Method: POST - Path: /api/token/
+2025-09-22 21:05:19.290700 - User:  - Method: POST - Path: /api/token/
+2025-09-22 21:06:41.755643 - User:  - Method: POST - Path: /api/designers/
+2025-09-22 21:33:02.335936 - User:  - Method: POST - Path: /api/designers/
+2025-09-22 21:34:22.617975 - User:  - Method: POST - Path: /api/register/
+2025-09-23 16:14:32.726414 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 16:17:35.649963 - User:  - Method: POST - Path: /api/token/
+2025-09-23 16:18:46.183525 - User:  - Method: POST - Path: /api/token/
+2025-09-23 16:19:28.954149 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 16:37:57.226940 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 16:38:12.822062 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 17:21:17.683992 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 17:27:10.881170 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 17:27:14.273003 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 17:27:39.144605 - User:  - Method: POST - Path: /api/token/
+2025-09-23 17:28:17.969825 - User:  - Method: POST - Path: /api/token/
+2025-09-23 17:28:53.196068 - User:  - Method: POST - Path: /api/token/
+2025-09-23 17:29:33.207568 - User:  - Method: POST - Path: /api/desginers/
+2025-09-23 17:30:17.047075 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 17:30:28.434790 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 20:12:28.330785 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 20:12:35.350788 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 20:12:47.955998 - User:  - Method: GET - Path: /api/designers/
+2025-09-23 20:13:05.575801 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 20:13:33.934025 - User:  - Method: GET - Path: /api/designers/
+2025-09-23 20:13:36.466601 - User:  - Method: GET - Path: /api/designers/
+2025-09-23 20:13:47.611506 - User:  - Method: GET - Path: /api/designers/
+2025-09-23 20:20:00.491806 - User:  - Method: POST - Path: /api/register/
+2025-09-23 20:21:17.816108 - User:  - Method: POST - Path: /api/register/
+2025-09-23 20:21:29.756842 - User:  - Method: POST - Path: /api/register/
+2025-09-23 20:22:45.344663 - User:  - Method: POST - Path: /api/register/
+2025-09-23 20:23:24.121506 - User:  - Method: POST - Path: /api/register/
+2025-09-23 20:25:04.902199 - User:  - Method: POST - Path: /api/token/
+2025-09-23 20:26:09.529753 - User:  - Method: POST - Path: /api/token/
+2025-09-23 20:26:52.074317 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 20:27:35.250214 - User:  - Method: POST - Path: /api/token/
+2025-09-23 20:28:50.811246 - User:  - Method: POST - Path: /api/tokendesigners/
+2025-09-23 20:28:59.040312 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 20:33:35.926305 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 20:34:56.201000 - User:  - Method: POST - Path: /api/token/
+2025-09-23 20:36:05.864274 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 20:39:43.965599 - User:  - Method: POST - Path: /api/token/
+2025-09-23 20:42:46.728049 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 20:42:57.663477 - User:  - Method: POST - Path: /api/designer/
+2025-09-23 20:43:37.904566 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 20:53:37.300114 - User:  - Method: POST - Path: /api/register/
+2025-09-23 20:58:11.849418 - User:  - Method: POST - Path: /api/token/
+2025-09-23 20:58:55.758913 - User:  - Method: POST - Path: /api/token/
+2025-09-23 20:59:49.143962 - User:  - Method: POST - Path: /api/token/
+2025-09-23 21:00:17.934666 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 21:05:47.292021 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 21:05:55.157047 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 21:08:21.148552 - User:  - Method: POST - Path: /admin/
+2025-09-23 21:08:29.467364 - User:  - Method: GET - Path: /admin/
+2025-09-23 21:08:29.547155 - User:  - Method: GET - Path: /admin/login/
+2025-09-23 21:08:45.097248 - User:  - Method: POST - Path: /admin/login/
+2025-09-23 21:08:47.147859 - User: admin - Method: GET - Path: /admin/
+2025-09-23 21:08:47.440321 - User: admin - Method: POST - Path: /admin/login/
+2025-09-23 21:25:39.751564 - User:  - Method: POST - Path: /api/token/
+2025-09-23 21:26:26.492387 - User:  - Method: POST - Path: /api/token/
+2025-09-23 21:27:28.715391 - User:  - Method: POST - Path: /api/designers/
+2025-09-23 21:27:35.622006 - User: admin - Method: POST - Path: /admin/login/
+2025-09-23 23:16:34.847382 - User:  - Method: POST - Path: /api/register/
+2025-09-23 23:16:52.193638 - User:  - Method: POST - Path: /api/register/
+2025-09-23 23:17:45.189348 - User:  - Method: POST - Path: /api/register/
+2025-09-24 01:45:38.451353 - User:  - Method: POST - Path: /api/register/
+2025-09-24 01:45:57.555414 - User:  - Method: POST - Path: /api/token/
+2025-09-24 01:46:21.049083 - User:  - Method: POST - Path: /api/token/
+2025-09-24 01:47:04.710943 - User:  - Method: POST - Path: /api/register/
+2025-09-24 01:49:51.830758 - User:  - Method: POST - Path: /api/designers/
+2025-09-24 01:50:11.663253 - User:  - Method: POST - Path: /api/designers/
+2025-09-24 02:11:07.060805 - User:  - Method: POST - Path: /api/register/
+2025-09-24 02:28:54.032133 - User:  - Method: GET - Path: /api/designers/
+2025-09-24 02:30:18.580168 - User:  - Method: PATCH - Path: /api/designers/1/
+2025-09-24 02:33:00.912249 - User:  - Method: PATCH - Path: /api/designers/5/
+2025-09-24 02:33:03.669796 - User:  - Method: PATCH - Path: /api/designers/5/
+2025-09-24 02:33:09.601445 - User:  - Method: PATCH - Path: /api/designers/6/
+2025-09-24 02:33:41.141174 - User:  - Method: PATCH - Path: /api/designers/4/
+2025-09-24 02:33:46.837172 - User:  - Method: PATCH - Path: /api/designers/5/
+2025-09-24 02:41:14.168627 - User:  - Method: PATCH - Path: /api/designers/5/
+2025-09-24 02:41:17.676688 - User:  - Method: PATCH - Path: /api/designers/5/
+2025-09-24 02:41:26.927136 - User:  - Method: PATCH - Path: /api/designers/6/
+2025-09-24 02:41:32.652094 - User:  - Method: PATCH - Path: /api/designers/5/
+2025-09-24 02:42:19.131703 - User:  - Method: PATCH - Path: /api/designers/5/
+2025-09-24 02:45:21.708552 - User:  - Method: PATCH - Path: /api/designers/5/
+2025-09-24 02:53:56.620095 - User:  - Method: PATCH - Path: /api/designers/5/
+2025-09-24 02:53:58.606825 - User:  - Method: PATCH - Path: /api/designers/5/
+2025-09-24 02:58:34.000243 - User:  - Method: PATCH - Path: /api/designers/5/
+2025-09-24 02:58:35.572563 - User:  - Method: PATCH - Path: /api/designers/5/
+2025-09-24 02:58:55.467871 - User:  - Method: PATCH - Path: /api/designers/5/
+2025-09-24 03:08:58.719532 - User:  - Method: GET - Path: /api/designers/
+2025-09-24 03:09:23.255753 - User: admin - Method: GET - Path: /api/designers/
+2025-09-24 03:09:24.083954 - User: admin - Method: GET - Path: /favicon.ico
+2025-09-24 03:09:28.280364 - User: admin - Method: GET - Path: /api/designers/
+2025-09-24 03:09:42.386937 - User: admin - Method: GET - Path: /api/users/
+2025-09-24 03:09:57.144471 - User: admin - Method: GET - Path: /api/dress/
+2025-09-24 03:10:04.523418 - User: admin - Method: GET - Path: /api/dresses/
+2025-09-24 03:10:16.002961 - User:  - Method: GET - Path: /api/dresses/
+2025-09-24 07:11:28.126773 - User:  - Method: PATCH - Path: /api/designers/5/
+2025-09-24 07:11:45.301344 - User:  - Method: POST - Path: /api/token/refresh/
+2025-09-24 10:59:45.155684 - User:  - Method: GET - Path: /admin/
+2025-09-24 10:59:45.371619 - User:  - Method: GET - Path: /admin/login/
+2025-09-24 10:59:52.082255 - User:  - Method: GET - Path: /admin/
+2025-09-24 10:59:52.088920 - User:  - Method: GET - Path: /admin/login/
+2025-09-24 11:00:42.772050 - User:  - Method: POST - Path: /api/register/

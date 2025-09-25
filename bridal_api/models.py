@@ -1,4 +1,3 @@
-# bridal_api/models.py
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -19,7 +18,6 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
-
 # -------------------------
 # Designer
 # -------------------------
@@ -29,10 +27,10 @@ class Designer(models.Model):
     bio = models.TextField(blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
+    view_count = models.PositiveIntegerField(default=0)   # <-- new field
 
     def __str__(self):
         return self.name or self.user.username
-
 
 # -------------------------
 # Collection
@@ -45,7 +43,6 @@ class Collection(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.designer.name or self.designer.user.username})"
-
 
 # -------------------------
 # Dress
@@ -60,13 +57,12 @@ class Dress(models.Model):
     stock = models.PositiveIntegerField(default=0)
     image = models.ImageField(upload_to="dress_images/", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    view_count = models.PositiveIntegerField(default=0)   # <-- new field
 
     def __str__(self):
         return f"{self.name} - {self.designer.user.username}"
-
-
 # -------------------------
-# VirtualTryOn
+# Virtual Try-On
 # -------------------------
 class VirtualTryOn(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="virtual_tryons")
@@ -78,9 +74,8 @@ class VirtualTryOn(models.Model):
     def __str__(self):
         return f"Try-On: {self.user.username} - {self.dress.name}"
 
-
 # -------------------------
-# FashionShow
+# Fashion Show
 # -------------------------
 class FashionShow(models.Model):
     collection = models.ForeignKey(Collection, on_delete=models.CASCADE, related_name="fashion_shows")
@@ -91,7 +86,6 @@ class FashionShow(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.collection.name}"
-
 
 # -------------------------
 # Appointment
@@ -112,7 +106,6 @@ class Appointment(models.Model):
     def __str__(self):
         return f"Appointment: {self.user.username} with {self.designer.user.username} on {self.date}"
 
-
 # -------------------------
 # Cart & CartItem
 # -------------------------
@@ -128,7 +121,6 @@ class Cart(models.Model):
     def __str__(self):
         return f"Cart of {self.user.username}"
 
-
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="items")
     dress = models.ForeignKey(Dress, on_delete=models.CASCADE)
@@ -137,7 +129,6 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f"{self.dress.name} x {self.quantity}"
-
 
 # -------------------------
 # Order & OrderItem
@@ -163,7 +154,6 @@ class Order(models.Model):
         return self.total_amount
 
     def save(self, *args, **kwargs):
-        # update total_amount from cart items if available
         if self.cart:
             self.total_amount = self.calculate_total()
         super().save(*args, **kwargs)
