@@ -6,5 +6,5 @@ class BridalApiConfig(AppConfig):
     name = 'bridal_api'
 
     def ready(self):
-        # import signals to register them
-        from . import signals  # noqa: F401
+        # import signals to connect them
+        import bridal_api.signals  # noqa: F401

@@ -138,3 +138,77 @@
 2025-09-24 10:59:52.082255 - User:  - Method: GET - Path: /admin/
 2025-09-24 10:59:52.088920 - User:  - Method: GET - Path: /admin/login/
 2025-09-24 11:00:42.772050 - User:  - Method: POST - Path: /api/register/
+2025-09-25 16:20:17.678473 - User: admin - Method: GET - Path: /products/
+2025-09-25 16:20:18.258795 - User: admin - Method: GET - Path: /favicon.ico
+2025-09-25 16:21:16.435918 - User:  - Method: GET - Path: /products/
+2025-09-25 16:21:27.399126 - User:  - Method: POST - Path: /products/
+2025-09-25 16:24:31.595011 - User:  - Method: GET - Path: /categories/
+2025-09-25 16:24:59.193074 - User:  - Method: GET - Path: /categories/
+2025-09-25 16:25:06.715074 - User:  - Method: GET - Path: /categories/
+2025-09-25 16:28:23.986553 - User:  - Method: GET - Path: /api/categories/
+2025-09-25 16:29:48.865319 - User:  - Method: POST - Path: /api/token/
+2025-09-25 16:30:56.915610 - User:  - Method: GET - Path: /api/categories/
+2025-09-25 16:31:24.579442 - User:  - Method: GET - Path: /api/categories/
+2025-09-25 16:40:14.444059 - User:  - Method: GET - Path: /api/categories/
+2025-09-25 16:40:23.425990 - User:  - Method: GET - Path: /api/categories/
+2025-09-25 16:41:05.612075 - User:  - Method: PATCH - Path: /api/admin/
+2025-09-25 16:41:12.267030 - User:  - Method: POST - Path: /api/admin/
+2025-09-25 16:41:30.310278 - User:  - Method: POST - Path: /admin/
+2025-09-25 16:41:32.731531 - User:  - Method: POST - Path: /admin/
+2025-09-25 16:41:56.285681 - User: admin - Method: GET - Path: /admin/
+2025-09-25 16:42:29.027366 - User:  - Method: POST - Path: /api/categories/
+2025-09-25 16:42:42.219061 - User:  - Method: POST - Path: /api/categories/
+2025-09-25 16:43:08.350281 - User:  - Method: GET - Path: /api/categories/
+2025-09-25 16:43:27.746634 - User:  - Method: POST - Path: /api/products/
+2025-09-25 16:43:44.259100 - User:  - Method: POST - Path: /api/products/
+2025-09-25 16:44:03.179549 - User:  - Method: GET - Path: /api/products/
+2025-09-25 16:46:27.951308 - User:  - Method: GET - Path: /api/products/
+2025-09-25 16:47:39.478060 - User: admin - Method: GET - Path: /admin/bridal_api/designer/add/
+2025-09-25 16:47:40.534191 - User: admin - Method: GET - Path: /admin/jsi18n/
+2025-09-25 16:47:45.753852 - User: admin - Method: GET - Path: /admin/
+2025-09-25 16:54:01.062129 - User:  - Method: GET - Path: /api/products/
+2025-09-25 16:54:26.808819 - User:  - Method: GET - Path: /api/products/
+2025-09-25 16:54:47.203374 - User:  - Method: GET - Path: /api/products/
+2025-09-25 16:55:12.459469 - User:  - Method: GET - Path: /api/products/
+2025-09-25 17:08:47.196758 - User: admin - Method: GET - Path: /admin/
+2025-09-25 17:09:12.376171 - User:  - Method: POST - Path: /api/register/
+2025-09-25 17:09:38.920913 - User:  - Method: POST - Path: /api/register/
+2025-09-25 17:14:52.309895 - User:  - Method: POST - Path: /api/register/
+2025-09-25 17:15:21.202053 - User:  - Method: POST - Path: /api/register/
+2025-09-25 17:15:35.211181 - User:  - Method: POST - Path: /api/register/
+2025-09-25 17:15:49.548999 - User: admin - Method: GET - Path: /admin/bridal_api/user/
+2025-09-25 17:15:50.206287 - User: admin - Method: GET - Path: /admin/jsi18n/
+2025-09-25 17:15:54.394471 - User: admin - Method: GET - Path: /admin/bridal_api/user/1/change/
+2025-09-25 17:15:55.121586 - User: admin - Method: GET - Path: /admin/jsi18n/
+2025-09-25 17:16:01.068609 - User: admin - Method: GET - Path: /admin/bridal_api/user/
+2025-09-25 17:16:03.531920 - User: admin - Method: GET - Path: /admin/
+2025-09-25 17:16:06.198232 - User: admin - Method: GET - Path: /admin/bridal_api/cart/
+2025-09-25 17:16:06.600617 - User: admin - Method: GET - Path: /admin/jsi18n/
+2025-09-25 17:16:09.224623 - User: admin - Method: GET - Path: /admin/bridal_api/cart/6/change/
+2025-09-25 17:16:09.595642 - User: admin - Method: GET - Path: /admin/jsi18n/
+2025-09-25 17:16:13.224582 - User: admin - Method: GET - Path: /admin/bridal_api/cart/
+2025-09-25 17:16:13.934109 - User: admin - Method: GET - Path: /admin/
+2025-09-25 17:16:45.876850 - User:  - Method: POST - Path: /api/register/
+2025-09-25 17:16:57.717629 - User:  - Method: POST - Path: /api/register/
+2025-09-25 17:23:48.889540 - User: admin - Method: GET - Path: /admin/
+2025-09-25 17:23:58.292981 - User: admin - Method: GET - Path: /swagger/
+2025-09-25 17:24:00.871055 - User: admin - Method: GET - Path: /swagger/
+2025-09-25 17:24:10.707610 - User: admin - Method: GET - Path: /swagger/
+2025-09-25 17:24:12.119742 - User: admin - Method: GET - Path: /swagger/
+2025-09-25 17:24:24.969310 - User: admin - Method: GET - Path: /accounts/login/
+2025-09-25 17:26:17.419088 - User: admin - Method: POST - Path: /api/api/users/register/
+2025-09-25 17:31:14.966180 - User: admin - Method: POST - Path: /api/api/users/register/
+2025-09-25 17:31:17.452215 - User: admin - Method: POST - Path: /api/api/users/register/
+2025-09-25 17:32:18.348006 - User: admin - Method: GET - Path: /redoc/
+2025-09-25 17:32:19.694330 - User: admin - Method: GET - Path: /redoc/
+2025-09-25 17:33:06.043836 - User: admin - Method: POST - Path: /api/api/users/register/
+2025-09-25 17:33:52.966861 - User: admin - Method: POST - Path: /api/api/users/register/
+2025-09-25 17:38:05.034917 - User: admin - Method: GET - Path: /swagger/
+2025-09-25 17:38:05.644421 - User: admin - Method: GET - Path: /swagger/
+2025-09-25 17:44:13.638385 - User: admin - Method: GET - Path: /swagger/
+2025-09-25 17:44:14.356697 - User: admin - Method: GET - Path: /swagger/
+2025-09-25 17:46:19.056667 - User: admin - Method: POST - Path: /api/api/users/register/
+2025-09-25 17:48:47.876338 - User: admin - Method: GET - Path: /swagger/
+2025-09-25 17:48:48.477267 - User: admin - Method: GET - Path: /swagger/
+2025-09-25 17:49:16.421051 - User: admin - Method: POST - Path: /api/api/users/register/
+2025-09-25 17:50:25.848200 - User: admin - Method: GET - Path: /api/api/users/19/
