@@ -38,20 +38,20 @@ schema_view = get_schema_view(
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
-    authentication_classes=[JWTAuthentication],  # <-- important for Authorize button
+    authentication_classes=[JWTAuthentication],  # for the Authorize button
 )
 
 # -------------------- URL Patterns --------------------
 urlpatterns = [
     # DRF router urls
-    path('api/', include(router.urls)),
+    path('', include(router.urls)),
 
     # JWT Authentication
-    path('api/users/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/users/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('users/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('users/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # Swagger/OpenAPI
-    path('swagger(<format>\.json|\.yaml)', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('swagger<format>\.json', schema_view.without_ui(cache_timeout=0), name='schema-json'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
