@@ -1,5 +1,7 @@
 from pathlib import Path
 from datetime import timedelta
+from decouple import config
+
 
 # ---------------------
 # BASE SETTINGS
@@ -82,12 +84,12 @@ WSGI_APPLICATION = 'project_nexus.wsgi.application'
 # ---------------------
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'bridal_db',
-        'USER': 'bridal_user',
-        'PASSWORD': 'YourStrongPassword',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.mysql',  # Using MySQL
+        'NAME': config('MYSQL_DB', default='benareyo_bridal'),
+        'USER': config('MYSQL_USER', default='root'),
+        'PASSWORD': config('MYSQL_PASSWORD', default=''),  
+        'HOST': config('MYSQL_HOST', default='localhost'),
+        'PORT': config('MYSQL_PORT', default='3306'),
     }
 }
 

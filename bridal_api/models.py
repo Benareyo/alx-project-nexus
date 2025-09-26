@@ -55,6 +55,7 @@ class Collection(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     products = models.ManyToManyField(Product, related_name="collections")
+    created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.name
@@ -66,6 +67,7 @@ class Designer(models.Model):
     name = models.CharField(max_length=200)
     bio = models.TextField(blank=True)
     collections = models.ManyToManyField(Collection, related_name="designers")
+    created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return self.name
@@ -78,6 +80,7 @@ class Appointment(models.Model):
     designer = models.ForeignKey(Designer, on_delete=models.CASCADE, related_name="appointments")
     appointment_date = models.DateTimeField(null=True, blank=True)
     notes = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"Appointment with {self.designer.name} on {self.appointment_date}"
@@ -104,7 +107,7 @@ class CartItem(models.Model):
         unique_together = ("cart", "product")
 
     def __str__(self):
-        return f"{self.quantity} x {self.product.name}"
+        return f"{self.quantity} x {self.product.name if self.product else 'Deleted Product'}"
 
 # --------------------------------------
 # ORDER

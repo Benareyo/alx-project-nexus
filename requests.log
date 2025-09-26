@@ -212,3 +212,15 @@
 2025-09-25 17:48:48.477267 - User: admin - Method: GET - Path: /swagger/
 2025-09-25 17:49:16.421051 - User: admin - Method: POST - Path: /api/api/users/register/
 2025-09-25 17:50:25.848200 - User: admin - Method: GET - Path: /api/api/users/19/
+2025-09-26 00:22:09.639258 - User:  - Method: GET - Path: /admin/
+2025-09-26 00:22:09.706771 - User:  - Method: GET - Path: /admin/login/
+2025-09-26 00:22:20.550735 - User:  - Method: GET - Path: /swagger/
+2025-09-26 00:22:20.770274 - User:  - Method: GET - Path: /swagger/
+2025-09-26 00:22:45.800647 - User:  - Method: POST - Path: /admin/login/
+2025-09-26 00:24:37.187675 - User:  - Method: POST - Path: /admin/login/
+2025-09-26 00:24:38.704144 - User: admin - Method: GET - Path: /admin/
+2025-09-26 00:24:43.905925 - User: admin - Method: GET - Path: /admin/auth/
+2025-09-26 00:24:46.053867 - User: admin - Method: GET - Path: /admin/auth/group/
+2025-09-26 00:24:46.176938 - User: admin - Method: GET - Path: /admin/jsi18n/
+2025-09-26 00:24:48.680512 - User: admin - Method: GET - Path: /admin/auth/
+2025-09-26 00:24:49.527004 - User: admin - Method: GET - Path: /admin/
