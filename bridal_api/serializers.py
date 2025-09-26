@@ -1,207 +1,97 @@
 # bridal_api/serializers.py
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
 from .models import (
-    Designer, Collection, Dress, VirtualTryOn, FashionShow,
-    Appointment, Cart, CartItem, Order
+    User, Category, Product, Collection, Designer, Appointment,
+    Cart, CartItem, Order, OrderItem
 )
 
-User = get_user_model()
-
-# -------------------------
-# User serializers
-# -------------------------
-class UserTinySerializer(serializers.ModelSerializer):
-    """Minimal info for nested relationships."""
-    class Meta:
-        model = User
-        fields = ("id", "username", "email")
-
-
+# -------------------- USER --------------------
 class UserSerializer(serializers.ModelSerializer):
-    """
-    Full user serializer used for registration and admin user management.
-    - password is write_only and will be hashed.
-    - email is required and unique validation is performed by the model, but we re-check here.
-    """
-    password = serializers.CharField(write_only=True, required=True, min_length=6)
-
+    """For returning user info including role."""
     class Meta:
         model = User
-        fields = [
-            "id", "username", "email", "password", "role",
-            "phone", "address", "first_name", "last_name"
-        ]
-        read_only_fields = ["id"]
+        fields = ["id", "username", "email", "role"]
 
-    def validate_email(self, value):
-        # Ensure email uniqueness (helps give clearer error messages)
-        qs = User.objects.filter(email__iexact=value)
-        if self.instance:
-            qs = qs.exclude(pk=self.instance.pk)
-        if qs.exists():
-            raise serializers.ValidationError("A user with this email already exists.")
+class UserRegisterSerializer(serializers.ModelSerializer):
+    """For registering a new user with role validation."""
+    password = serializers.CharField(write_only=True)
+    role = serializers.ChoiceField(choices=User.ROLE_CHOICES)
+    
+    class Meta:
+        model = User
+        fields = ["username", "email", "password", "role"]
+
+    def validate_role(self, value):
+        valid_roles = [choice[0] for choice in User.ROLE_CHOICES]  # Ensure matches model choices
+        if value not in valid_roles:
+            raise serializers.ValidationError(f'"{value}" is not a valid role. Choose from {valid_roles}.')
         return value
 
     def create(self, validated_data):
         password = validated_data.pop("password")
         user = User(**validated_data)
-        user.set_password(password)
+        user.set_password(password)  # hash the password
         user.save()
         return user
 
-    def update(self, instance, validated_data):
-        # Support safe password update
-        password = validated_data.pop("password", None)
-        for attr, val in validated_data.items():
-            setattr(instance, attr, val)
-        if password:
-            instance.set_password(password)
-        instance.save()
-        return instance
-
-
-# -------------------------
-# Designer
-# -------------------------
-class DesignerSerializer(serializers.ModelSerializer):
-    user = UserTinySerializer(read_only=True)
-    # allow frontend to set user by id when creating a designer (admin flow)
-    user_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), write_only=True, source="user", required=False
-    )
-
+# -------------------- CATEGORY --------------------
+class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        model = Designer
-        fields = ["id", "user", "user_id", "name", "bio", "phone", "email"]
-        read_only_fields = ["id", "user"]
+        model = Category
+        fields = "__all__"
 
+# -------------------- PRODUCT --------------------
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = "__all__"
 
-# -------------------------
-# Collection
-# -------------------------
+# -------------------- COLLECTION --------------------
 class CollectionSerializer(serializers.ModelSerializer):
-    designer = DesignerSerializer(read_only=True)
-    designer_id = serializers.PrimaryKeyRelatedField(
-        queryset=Designer.objects.all(), source="designer", write_only=True
-    )
-
     class Meta:
         model = Collection
-        fields = ["id", "designer", "designer_id", "name", "description", "created_at"]
-        read_only_fields = ["id", "created_at"]
+        fields = "__all__"
 
-
-# -------------------------
-# Dress
-# -------------------------
-class DressSerializer(serializers.ModelSerializer):
-    designer = DesignerSerializer(read_only=True)
-    designer_id = serializers.PrimaryKeyRelatedField(
-        queryset=Designer.objects.all(), source="designer", write_only=True
-    )
-    collection = CollectionSerializer(read_only=True)
-    collection_id = serializers.PrimaryKeyRelatedField(
-        queryset=Collection.objects.all(), source="collection", write_only=True, required=False, allow_null=True
-    )
-
+# -------------------- DESIGNER --------------------
+class DesignerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Dress
-        fields = [
-            "id", "name", "designer", "designer_id",
-            "collection", "collection_id",
-            "price", "description", "size", "stock", "image", "created_at"
-        ]
-        read_only_fields = ["id", "created_at"]
+        model = Designer
+        fields = "__all__"
 
-
-# -------------------------
-# VirtualTryOn
-# -------------------------
-class VirtualTryOnSerializer(serializers.ModelSerializer):
-    user = UserTinySerializer(read_only=True)
-    dress = DressSerializer(read_only=True)
-    dress_id = serializers.PrimaryKeyRelatedField(
-        queryset=Dress.objects.all(), source="dress", write_only=True
-    )
-
-    class Meta:
-        model = VirtualTryOn
-        fields = ["id", "user", "dress", "dress_id", "user_image", "result_image", "created_at"]
-        read_only_fields = ["id", "user", "result_image", "created_at"]
-
-
-# -------------------------
-# FashionShow
-# -------------------------
-class FashionShowSerializer(serializers.ModelSerializer):
-    collection = CollectionSerializer(read_only=True)
-    collection_id = serializers.PrimaryKeyRelatedField(
-        queryset=Collection.objects.all(), source="collection", write_only=True
-    )
-    designer = DesignerSerializer(read_only=True)
-    designer_id = serializers.PrimaryKeyRelatedField(
-        queryset=Designer.objects.all(), source="designer", write_only=True
-    )
-
-    class Meta:
-        model = FashionShow
-        fields = ["id", "collection", "collection_id", "designer", "designer_id", "title", "scheduled_at", "description"]
-        read_only_fields = ["id"]
-
-
-# -------------------------
-# Appointment
-# -------------------------
+# -------------------- APPOINTMENT --------------------
 class AppointmentSerializer(serializers.ModelSerializer):
-    user = UserTinySerializer(read_only=True)
-    designer = DesignerSerializer(read_only=True)
-    designer_id = serializers.PrimaryKeyRelatedField(
-        queryset=Designer.objects.all(), source="designer", write_only=True
-    )
-
     class Meta:
         model = Appointment
-        fields = ["id", "user", "designer", "designer_id", "date", "notes", "status"]
-        read_only_fields = ["id", "user"]
+        fields = "__all__"
 
-
-# -------------------------
-# Cart & CartItem
-# -------------------------
+# -------------------- CART ITEM --------------------
 class CartItemSerializer(serializers.ModelSerializer):
-    dress = DressSerializer(read_only=True)
-    dress_id = serializers.PrimaryKeyRelatedField(
-        queryset=Dress.objects.all(), source="dress", write_only=True
-    )
+    product = ProductSerializer(read_only=True)
 
     class Meta:
         model = CartItem
-        fields = ["id", "cart", "dress", "dress_id", "quantity", "added_at"]
-        read_only_fields = ["id", "added_at"]
+        fields = ["id", "product", "quantity"]
 
-
+# -------------------- CART --------------------
 class CartSerializer(serializers.ModelSerializer):
-    user = UserTinySerializer(read_only=True)
     items = CartItemSerializer(many=True, read_only=True)
 
     class Meta:
         model = Cart
-        fields = ["id", "user", "items", "created_at", "updated_at"]
-        read_only_fields = ["id", "user", "created_at", "updated_at"]
+        fields = ["id", "user", "created_at", "items"]
 
+# -------------------- ORDER ITEM --------------------
+class OrderItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
 
-# -------------------------
-# Order
-# -------------------------
+    class Meta:
+        model = OrderItem
+        fields = ["id", "product", "quantity", "price"]
+
+# -------------------- ORDER --------------------
 class OrderSerializer(serializers.ModelSerializer):
-    user = UserTinySerializer(read_only=True)
-    cart = CartSerializer(read_only=True)
-    cart_id = serializers.PrimaryKeyRelatedField(
-        queryset=Cart.objects.all(), source="cart", write_only=True, required=False
-    )
+    items = OrderItemSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order
-        fields = ["id", "user", "cart", "cart_id", "total_amount", "status", "created_at", "updated_at"]
-        read_only_fields = ["id", "user", "total_amount", "created_at", "updated_at"]
+        fields = ["id", "user", "total_price", "status", "created_at", "items"]

@@ -1,294 +1,198 @@
 # bridal_api/views.py
-from rest_framework import viewsets, status, generics
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import viewsets, filters, status
+from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.exceptions import PermissionDenied
-from django.contrib.auth import get_user_model
-from django.conf import settings
-from django.db import transaction
-from PIL import Image
-import os
-
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 from .models import (
-    Designer, Collection, Dress, VirtualTryOn,
-    FashionShow, Appointment, Cart, CartItem, Order
+    User, Category, Product, Collection, Designer, Appointment,
+    Cart, CartItem, Order, OrderItem
 )
 from .serializers import (
-    UserSerializer, DesignerSerializer, CollectionSerializer,
-    DressSerializer, VirtualTryOnSerializer, FashionShowSerializer,
-    AppointmentSerializer, CartSerializer, CartItemSerializer, OrderSerializer
+    UserSerializer, UserRegisterSerializer, CategorySerializer,
+    ProductSerializer, CollectionSerializer, DesignerSerializer,
+    AppointmentSerializer, CartSerializer, CartItemSerializer,
+    OrderSerializer, OrderItemSerializer
 )
-from .permissions import IsOwnerOrAdmin, IsAdminOrDesigner, IsAdmin, IsDesigner
+from .pagination import StandardResultsSetPagination
+from .permissions import IsAdmin, IsDesigner, IsAdminOrDesigner, IsOwnerOrAdmin
 
-User = get_user_model()
 
-# -------------------------
-# Register & Logout (JWT)
-# -------------------------
-class RegisterView(generics.CreateAPIView):
-    """Create account and return JWT tokens"""
+# -------------------- USER --------------------
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    CRUD API for users.
+    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [AllowAny]
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["username", "email"]
+    ordering_fields = ["date_joined", "username"]
+    ordering = ["-date_joined"]
+    permission_classes = [IsAdmin]
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
+    @swagger_auto_schema(
+        method='post',
+        request_body=UserRegisterSerializer,
+        responses={201: UserSerializer}
+    )
+    @action(detail=False, methods=["post"], url_path="register", permission_classes=[])
+    def register(self, request):
+        """
+        Register a new user (customer, designer, or admin). No authentication required.
+        """
+        serializer = UserRegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @swagger_auto_schema(
+        method='post',
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'email': openapi.Schema(type=openapi.TYPE_STRING, description='User email'),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, description='User password')
+            },
+            required=['email', 'password']
+        ),
+        responses={200: openapi.Response('JWT Token', schema=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'refresh': openapi.Schema(type=openapi.TYPE_STRING),
+                'access': openapi.Schema(type=openapi.TYPE_STRING)
+            }
+        ))}
+    )
+    @action(detail=False, methods=['post'], url_path='login', permission_classes=[])
+    def login(self, request):
+        """
+        Obtain JWT token pair for a user.
+        """
+        email = request.data.get("email")
+        password = request.data.get("password")
+        if not email or not password:
+            return Response({"detail": "Email and password required."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"detail": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        if not user.check_password(password):
+            return Response({"detail": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
+        
         refresh = RefreshToken.for_user(user)
         return Response({
-            "user": UserSerializer(user).data,
             "refresh": str(refresh),
             "access": str(refresh.access_token)
-        }, status=status.HTTP_201_CREATED)
+        })
 
 
-class LogoutView(APIView):
-    """Blacklist a refresh token (logout)"""
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request):
-        try:
-            refresh_token = request.data["refresh"]
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-            return Response({"detail": "Logged out successfully"}, status=status.HTTP_200_OK)
-        except Exception:
-            return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+# -------------------- CATEGORY --------------------
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["name"]
+    ordering_fields = ["name", "created_at"]
+    ordering = ["name"]
+    permission_classes = [IsAdminOrDesigner]
 
 
-# -------------------------
-# Users
-# -------------------------
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+# -------------------- PRODUCT --------------------
+class ProductViewSet(viewsets.ModelViewSet):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ["category", "designer", "collection"]
+    search_fields = ["name", "description"]
+    ordering_fields = ["price", "created_at"]
+    ordering = ["-created_at"]
+    permission_classes = [IsAdminOrDesigner]
 
 
-# -------------------------
-# Designers
-# -------------------------
+# -------------------- DESIGNER --------------------
 class DesignerViewSet(viewsets.ModelViewSet):
-    """
-    - GET: authenticated users can view designers
-    - POST: admin can create any Designer; a user with role 'designer' may create own profile which will be linked to their user
-    - PATCH/PUT/DELETE: only owner (designer.user) or admin can change
-    """
-    queryset = Designer.objects.select_related("user").all()
+    queryset = Designer.objects.all()
     serializer_class = DesignerSerializer
-    permission_classes = [IsAdminOrDesigner, IsOwnerOrAdmin]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['name', 'email', 'phone']
-
-    def perform_create(self, serializer):
-        user = self.request.user
-        # Admin can create a designer for any user (expect serializer to accept user_id if you added that)
-        if user.is_staff:
-            serializer.save()
-            return
-
-        # If requester is a designer, auto-attach their user
-        if getattr(user, "role", "") == "designer":
-            serializer.save(user=user)
-            return
-
-        raise PermissionDenied("Only admins or designer users can create designer profiles.")
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["name", "bio"]
+    ordering_fields = ["name", "created_at"]
+    ordering = ["name"]
+    permission_classes = [IsAdmin]
 
 
-# -------------------------
-# Collections
-# -------------------------
+# -------------------- COLLECTION --------------------
 class CollectionViewSet(viewsets.ModelViewSet):
-    """
-    Collections can be created by:
-     - admin: create for any designer (if serializer supports designer_id)
-     - designer: create collections that will be linked to their Designer profile
-    """
-    queryset = Collection.objects.select_related("designer__user").all()
+    queryset = Collection.objects.all()
     serializer_class = CollectionSerializer
-    permission_classes = [IsAdminOrDesigner, IsOwnerOrAdmin]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['name', 'designer__name']
-
-    def perform_create(self, serializer):
-        user = self.request.user
-        # admin: can set designer explicitly using serializer write field (designer_id)
-        if user.is_staff:
-            serializer.save()
-            return
-
-        if getattr(user, "role", "") == "designer":
-            # attach user's designer_profile (ensure it exists through signals or admin)
-            if not hasattr(user, "designer_profile"):
-                raise PermissionDenied("Designer profile not found for this user.")
-            serializer.save(designer=user.designer_profile)
-            return
-
-        raise PermissionDenied("Only admin or designers can create collections.")
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["title", "description"]
+    ordering_fields = ["title", "created_at"]
+    ordering = ["title"]
+    permission_classes = [IsAdminOrDesigner]
 
 
-# -------------------------
-# Dresses
-# -------------------------
-class DressViewSet(viewsets.ModelViewSet):
-    """
-    Similar rules as Collection:
-    - admin can create/update/delete any dress
-    - designer users can create dresses attached to their designer_profile
-    """
-    queryset = Dress.objects.select_related("designer__user", "collection").all()
-    serializer_class = DressSerializer
-    permission_classes = [IsAdminOrDesigner, IsOwnerOrAdmin]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['name', 'designer__name', 'collection__name', 'price']
-
-    def perform_create(self, serializer):
-        user = self.request.user
-        if user.is_staff:
-            serializer.save()
-            return
-
-        if getattr(user, "role", "") == "designer":
-            if not hasattr(user, "designer_profile"):
-                raise PermissionDenied("Designer profile not found for this user.")
-            serializer.save(designer=user.designer_profile)
-            return
-
-        raise PermissionDenied("Only admin or designer users can create dresses.")
-
-
-# -------------------------
-# Virtual Try-On
-# -------------------------
-class VirtualTryOnViewSet(viewsets.ModelViewSet):
-    queryset = VirtualTryOn.objects.select_related("user", "dress").all()
-    serializer_class = VirtualTryOnSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
-
-    def get_queryset(self):
-        user = self.request.user
-        # Customers see only their own try-ons
-        if getattr(user, "role", "") == "customer":
-            return VirtualTryOn.objects.filter(user=user)
-        return super().get_queryset()
-
-    def perform_create(self, serializer):
-        virtual_tryon = serializer.save(user=self.request.user)
-        # image overlay: best-effort (non-blocking) — keep small and safe
-        try:
-            user_img_path = virtual_tryon.user_image.path
-            dress_img_path = virtual_tryon.dress.image.path
-
-            result_filename = f"result_{virtual_tryon.id}.png"
-            result_dir = os.path.join(settings.MEDIA_ROOT, "virtualtry/results")
-            os.makedirs(result_dir, exist_ok=True)
-            result_img_path = os.path.join(result_dir, result_filename)
-
-            user_img = Image.open(user_img_path).convert("RGBA")
-            dress_img = Image.open(dress_img_path).convert("RGBA")
-            dress_img = dress_img.resize(user_img.size)
-            combined = Image.alpha_composite(user_img, dress_img)
-            combined.save(result_img_path)
-
-            virtual_tryon.result_image.name = f"virtualtry/results/{result_filename}"
-            virtual_tryon.save()
-        except Exception:
-            # don't crash the request if overlay fails
-            pass
-
-
-# -------------------------
-# Fashion Shows
-# -------------------------
-class FashionShowViewSet(viewsets.ModelViewSet):
-    queryset = FashionShow.objects.select_related("designer", "collection").all()
-    serializer_class = FashionShowSerializer
-    permission_classes = [IsAdminOrDesigner, IsOwnerOrAdmin]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['title', 'designer__name', 'collection__name']
-
-    def get_queryset(self):
-        user = self.request.user
-        if getattr(user, "role", "") == "designer":
-            # designers only see their own fashion shows
-            return FashionShow.objects.filter(designer=user.designer_profile)
-        return super().get_queryset()
-
-    def perform_create(self, serializer):
-        user = self.request.user
-        if user.is_staff:
-            serializer.save()
-            return
-        if getattr(user, "role", "") == "designer":
-            serializer.save(designer=user.designer_profile)
-            return
-        raise PermissionDenied("Only admins or designers can create fashion shows.")
-
-
-# -------------------------
-# Appointments
-# -------------------------
+# -------------------- APPOINTMENT --------------------
 class AppointmentViewSet(viewsets.ModelViewSet):
-    queryset = Appointment.objects.select_related("user", "designer").all()
+    queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['date', 'status', 'designer__name']
-
-    def get_queryset(self):
-        user = self.request.user
-        if getattr(user, "role", "") == "customer":
-            return Appointment.objects.filter(user=user)
-        if getattr(user, "role", "") == "designer":
-            return Appointment.objects.filter(designer=user.designer_profile)
-        return super().get_queryset()
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["notes"]
+    ordering_fields = ["appointment_date", "created_at"]
+    ordering = ["-appointment_date"]
+    permission_classes = [IsOwnerOrAdmin]
 
 
-# -------------------------
-# Cart & CartItem
-# -------------------------
+# -------------------- CART --------------------
 class CartViewSet(viewsets.ModelViewSet):
-    queryset = Cart.objects.select_related("user").prefetch_related("items").all()
+    queryset = Cart.objects.all()
     serializer_class = CartSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
-
-    def get_queryset(self):
-        return Cart.objects.filter(user=self.request.user)
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+    pagination_class = StandardResultsSetPagination
+    permission_classes = [IsOwnerOrAdmin]
 
 
+# -------------------- CART ITEM --------------------
 class CartItemViewSet(viewsets.ModelViewSet):
-    queryset = CartItem.objects.select_related("cart", "dress").all()
+    queryset = CartItem.objects.all()
     serializer_class = CartItemSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
-
-    def get_queryset(self):
-        return CartItem.objects.filter(cart__user=self.request.user)
-
-
-# -------------------------
-# Orders
-# -------------------------
-class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.select_related("user", "cart").all()
-    serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+    pagination_class = StandardResultsSetPagination
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['status', 'created_at']
+    filterset_fields = ["cart", "product"]
+    permission_classes = [IsOwnerOrAdmin]
 
-    def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
 
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+# -------------------- ORDER --------------------
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ["user", "status"]
+    ordering_fields = ["created_at", "total_price"]
+    ordering = ["-created_at"]
+    permission_classes = [IsOwnerOrAdmin]
+
+
+# -------------------- ORDER ITEM --------------------
+class OrderItemViewSet(viewsets.ModelViewSet):
+    queryset = OrderItem.objects.all()
+    serializer_class = OrderItemSerializer
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["order", "product"]
+    permission_classes = [IsOwnerOrAdmin]
