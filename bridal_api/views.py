@@ -1,12 +1,9 @@
-# bridal_api/views.py
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.permissions import IsAuthenticated
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
-
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
@@ -23,44 +20,47 @@ from .serializers import (
 from .pagination import StandardResultsSetPagination
 from .permissions import IsAdmin, IsDesigner, IsAdminOrDesigner, IsOwnerOrAdmin
 
-
 # -------------------- USER --------------------
 class UserViewSet(viewsets.ModelViewSet):
-    """
-    CRUD API for users.
-    """
     queryset = User.objects.all()
-    serializer_class = UserSerializer
     pagination_class = StandardResultsSetPagination
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ["username", "email"]
     ordering_fields = ["date_joined", "username"]
     ordering = ["-date_joined"]
-    permission_classes = [IsAdmin]
 
+    def get_serializer_class(self):
+        if self.action in ["create", "register"]:
+            return UserRegisterSerializer
+        return UserSerializer
+
+    def get_permissions(self):
+        if self.action in ["create", "register", "login"]:
+            return [AllowAny()]
+        return [IsAdmin()]
+
+    # ---------------- REGISTER ----------------
     @swagger_auto_schema(
         method='post',
         request_body=UserRegisterSerializer,
         responses={201: UserSerializer}
     )
-    @action(detail=False, methods=["post"], url_path="register", permission_classes=[])
+    @action(detail=False, methods=["post"], url_path="register")
     def register(self, request):
-        """
-        Register a new user (customer, designer, or admin). No authentication required.
-        """
-        serializer = UserRegisterSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    # ---------------- LOGIN ----------------
     @swagger_auto_schema(
         method='post',
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'email': openapi.Schema(type=openapi.TYPE_STRING, description='User email'),
-                'password': openapi.Schema(type=openapi.TYPE_STRING, description='User password')
+                'email': openapi.Schema(type=openapi.TYPE_STRING, description="User email"),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, description="User password")
             },
             required=['email', 'password']
         ),
@@ -72,30 +72,27 @@ class UserViewSet(viewsets.ModelViewSet):
             }
         ))}
     )
-    @action(detail=False, methods=['post'], url_path='login', permission_classes=[])
+    @action(detail=False, methods=['post'], url_path='login')
     def login(self, request):
-        """
-        Obtain JWT token pair for a user.
-        """
         email = request.data.get("email")
         password = request.data.get("password")
+
         if not email or not password:
             return Response({"detail": "Email and password required."}, status=status.HTTP_400_BAD_REQUEST)
-        
+
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
             return Response({"detail": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
-        
+
         if not user.check_password(password):
             return Response({"detail": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
-        
+
         refresh = RefreshToken.for_user(user)
         return Response({
             "refresh": str(refresh),
             "access": str(refresh.access_token)
         })
-
 
 # -------------------- CATEGORY --------------------
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -108,19 +105,28 @@ class CategoryViewSet(viewsets.ModelViewSet):
     ordering = ["name"]
     permission_classes = [IsAdminOrDesigner]
 
-
 # -------------------- PRODUCT --------------------
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     pagination_class = StandardResultsSetPagination
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ["category", "designer", "collection"]
+    filterset_fields = ["category"]
     search_fields = ["name", "description"]
     ordering_fields = ["price", "created_at"]
     ordering = ["-created_at"]
     permission_classes = [IsAdminOrDesigner]
 
+# -------------------- COLLECTION --------------------
+class CollectionViewSet(viewsets.ModelViewSet):
+    queryset = Collection.objects.all()
+    serializer_class = CollectionSerializer
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["name", "description"]
+    ordering_fields = ["name", "created_at"]
+    ordering = ["name"]
+    permission_classes = [IsAdminOrDesigner]
 
 # -------------------- DESIGNER --------------------
 class DesignerViewSet(viewsets.ModelViewSet):
@@ -133,19 +139,6 @@ class DesignerViewSet(viewsets.ModelViewSet):
     ordering = ["name"]
     permission_classes = [IsAdmin]
 
-
-# -------------------- COLLECTION --------------------
-class CollectionViewSet(viewsets.ModelViewSet):
-    queryset = Collection.objects.all()
-    serializer_class = CollectionSerializer
-    pagination_class = StandardResultsSetPagination
-    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ["title", "description"]
-    ordering_fields = ["title", "created_at"]
-    ordering = ["title"]
-    permission_classes = [IsAdminOrDesigner]
-
-
 # -------------------- APPOINTMENT --------------------
 class AppointmentViewSet(viewsets.ModelViewSet):
     queryset = Appointment.objects.all()
@@ -157,14 +150,12 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     ordering = ["-appointment_date"]
     permission_classes = [IsOwnerOrAdmin]
 
-
 # -------------------- CART --------------------
 class CartViewSet(viewsets.ModelViewSet):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsOwnerOrAdmin]
-
 
 # -------------------- CART ITEM --------------------
 class CartItemViewSet(viewsets.ModelViewSet):
@@ -174,7 +165,6 @@ class CartItemViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["cart", "product"]
     permission_classes = [IsOwnerOrAdmin]
-
 
 # -------------------- ORDER --------------------
 class OrderViewSet(viewsets.ModelViewSet):
@@ -186,7 +176,6 @@ class OrderViewSet(viewsets.ModelViewSet):
     ordering_fields = ["created_at", "total_price"]
     ordering = ["-created_at"]
     permission_classes = [IsOwnerOrAdmin]
-
 
 # -------------------- ORDER ITEM --------------------
 class OrderItemViewSet(viewsets.ModelViewSet):

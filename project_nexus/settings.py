@@ -1,3 +1,5 @@
+import os
+import dj_database_url
 from pathlib import Path
 from datetime import timedelta
 from decouple import config
@@ -48,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 
     # Custom middleware
     'bridal_api.middleware.bridal_middleware.BannedIPMiddleware',
@@ -90,6 +93,7 @@ DATABASES = {
         'PASSWORD': config('MYSQL_PASSWORD', default=''),  
         'HOST': config('MYSQL_HOST', default='localhost'),
         'PORT': config('MYSQL_PORT', default='3306'),
+        'default': dj_database_url.config(default=config('DATABASE_URL'))
     }
 }
 
@@ -171,7 +175,7 @@ USE_TZ = True
 # STATIC & MEDIA FILES
 # ---------------------
 STATIC_URL = 'static/'
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -179,6 +183,12 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # CORS CONFIGURATION
 # ---------------------
 CORS_ALLOW_ALL_ORIGINS = True
+
+# ---------------------
+# SECURITY
+# ---------------------
+DEBUG = config('DEBUG', default=False, cast=bool)
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
 
 # ---------------------
 # CUSTOM SETTINGS
