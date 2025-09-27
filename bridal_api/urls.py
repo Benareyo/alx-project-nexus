@@ -1,13 +1,12 @@
+# bridal_api/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from django.urls import path
-from .views import InitiatePaymentView, VerifyPaymentView
 from .views import (
     UserViewSet, CategoryViewSet, ProductViewSet,
     CollectionViewSet, DesignerViewSet, AppointmentViewSet,
     CartViewSet, CartItemViewSet, OrderViewSet, OrderItemViewSet,
-    ReviewListCreateView
+    ReviewListCreateView, InitiatePaymentView, VerifyPaymentView
 )
 
 # -------------------- DRF Router --------------------
@@ -25,14 +24,17 @@ router.register(r'order-items', OrderItemViewSet, basename='order-items')
 
 # -------------------- URL Patterns --------------------
 urlpatterns = [
+    # DRF ViewSets
     path('', include(router.urls)),
 
-    # Reviews (APIView, not ViewSet)
+    # Reviews (APIView)
     path("reviews/", ReviewListCreateView.as_view(), name="reviews"),
-    # Payment 
+
+    # Payment endpoints
     path("payments/initiate/", InitiatePaymentView.as_view(), name="initiate-payment"),
     path("payments/verify/", VerifyPaymentView.as_view(), name="verify-payment"),
+
     # JWT Authentication
-    path('users/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('users/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

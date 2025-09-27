@@ -6,10 +6,8 @@ import dj_database_url
 from urllib.parse import quote_plus
 from dotenv import load_dotenv
 
+load_dotenv()  # Load .env file
 
-load_dotenv()  # load .env
-
-CHAPA_SECRET_KEY = os.getenv("CHASECK_TEST-3HxsoYdRvawroxVQe7AtVjfPylteQkRH")
 # ---------------------------------------------------------------------
 # BASE DIRECTORY
 # ---------------------------------------------------------------------
@@ -19,8 +17,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY
 # ---------------------------------------------------------------------
 SECRET_KEY = config("SECRET_KEY", default="django-insecure-default-key")
+
+# Set DEBUG from environment; default to False in production
 DEBUG = config("DEBUG", default=False, cast=bool)
-ALLOWED_HOSTS = [h.strip() for h in config("ALLOWED_HOSTS", default="127.0.0.1,localhost").split(",")if h.strip()]
+
+# Include Render URL in ALLOWED_HOSTS for deployment
+ALLOWED_HOSTS = [h.strip() for h in config(
+    "ALLOWED_HOSTS",
+    default="127.0.0.1,localhost,bridal-backend-ixf1.onrender.com"
+).split(",") if h.strip()]
 
 # ---------------------------------------------------------------------
 # APPLICATIONS
@@ -94,21 +99,19 @@ DATABASES = {
 }
 
 # -----------------------------------------------------------------
-# DATABASES (robust)
+# DATABASES (robust MySQL URL builder)
 # -----------------------------------------------------------------
 def build_mysql_url_from_env():
     user = config("MYSQL_USER", default=None)
     db   = config("MYSQL_DB", default=None)
     if not (user and db):
         return None
-    password = config("MYSQL_PASSWORD", default="")
+    password = quote_plus(config("MYSQL_PASSWORD", default=""))
     host = config("MYSQL_HOST", default="127.0.0.1")
     port = config("MYSQL_PORT", default="3306")
-    # ensure special chars in password are safe in URL
-    password = quote_plus(password)
     return f"mysql://{user}:{password}@{host}:{port}/{db}"
 
-db_url = config("DATABASE_URL", default=None)
+db_url = config("DATABASE_URL", default=f"sqlite:///{BASE_DIR}/db.sqlite3")
 if not db_url:
     db_url = build_mysql_url_from_env()
 
@@ -147,15 +150,15 @@ USE_TZ = True
 # ---------------------------------------------------------------------
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "static"]
+
+# Ensure this directory exists or remove it if unused
+STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-
-# WhiteNoise (optional compression)
+# WhiteNoise (optional compression for static files)
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
 
 # ---------------------------------------------------------------------
 # REST FRAMEWORK
@@ -165,7 +168,7 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticated",
+        "rest_framework.permissions.AllowAny",
     ],
 }
 
@@ -204,3 +207,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # CUSTOM USER MODEL
 # ---------------------------------------------------------------------
 AUTH_USER_MODEL = "bridal_api.User"
+
+# ---------------------------------------------------------------------
+# SECURITY ENHANCEMENTS (optional but recommended)
+# ---------------------------------------------------------------------
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1:8000",
+]
