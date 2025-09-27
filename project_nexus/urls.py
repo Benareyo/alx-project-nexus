@@ -1,4 +1,5 @@
 # project_nexus/urls.py
+
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.http import JsonResponse
@@ -11,6 +12,15 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
+
+
+# Root welcome view
+def root_view(request):
+    return JsonResponse({
+        "message": "Welcome to Benareyo Bridal API 🎉",
+        "docs": "/swagger/"
+    })
+
 
 # Swagger schema
 schema_view = get_schema_view(
@@ -25,9 +35,6 @@ schema_view = get_schema_view(
     permission_classes=(permissions.AllowAny,),
 )
 
-# Root view
-def root_view(request):
-    return JsonResponse({"message": "Welcome to Bridal Backend!"})
 
 urlpatterns = [
     # Admin
@@ -39,7 +46,7 @@ urlpatterns = [
     # API
     path('api/', include('bridal_api.urls')),
 
-    # JWT
+    # JWT Auth
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
