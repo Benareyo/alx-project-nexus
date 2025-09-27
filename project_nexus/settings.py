@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from decouple import config
 import dj_database_url
+from urllib.parse import quote_plus
 
 # ---------------------------------------------------------------------
 # BASE DIRECTORY
@@ -14,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ---------------------------------------------------------------------
 SECRET_KEY = config("SECRET_KEY", default="django-insecure-default-key")
 DEBUG = config("DEBUG", default=True, cast=bool)
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost").split(",")
+ALLOWED_HOSTS = [h.strip() for h in config("ALLOWED_HOSTS", default="127.0.0.1,localhost").split(",")if h.strip()]
 
 # ---------------------------------------------------------------------
 # APPLICATIONS
@@ -87,6 +88,37 @@ DATABASES = {
     )
 }
 
+# -----------------------------------------------------------------
+# DATABASES (robust)
+# -----------------------------------------------------------------
+def build_mysql_url_from_env():
+    user = config("MYSQL_USER", default=None)
+    db   = config("MYSQL_DB", default=None)
+    if not (user and db):
+        return None
+    password = config("MYSQL_PASSWORD", default="")
+    host = config("MYSQL_HOST", default="127.0.0.1")
+    port = config("MYSQL_PORT", default="3306")
+    # ensure special chars in password are safe in URL
+    password = quote_plus(password)
+    return f"mysql://{user}:{password}@{host}:{port}/{db}"
+
+db_url = config("DATABASE_URL", default=None)
+if not db_url:
+    db_url = build_mysql_url_from_env()
+
+if db_url:
+    DATABASES = {
+        "default": dj_database_url.parse(db_url, conn_max_age=600, ssl_require=False)
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+
 # ---------------------------------------------------------------------
 # PASSWORD VALIDATORS
 # ---------------------------------------------------------------------
@@ -114,6 +146,11 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+
+# WhiteNoise (optional compression)
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 
 # ---------------------------------------------------------------------
 # REST FRAMEWORK
