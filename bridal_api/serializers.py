@@ -6,29 +6,29 @@ from .models import (
 
 # -------------------- USER --------------------
 class UserSerializer(serializers.ModelSerializer):
+    """General purpose User serializer for reading user info"""
     class Meta:
         model = User
-        fields = ["id", "username", "email", "role"]
+        fields = ['id', 'username', 'email', 'role', 'date_joined']
+        read_only_fields = ['id', 'role', 'date_joined']
 
-class UserRegisterSerializer(serializers.ModelSerializer):
+class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, min_length=8)
-    role = serializers.ChoiceField(choices=User.ROLE_CHOICES)
 
     class Meta:
         model = User
-        fields = ["username", "email", "password", "role"]
-
-    def validate_role(self, value):
-        if value not in [choice[0] for choice in User.ROLE_CHOICES]:
-            raise serializers.ValidationError("Invalid role")
-        return value
+        fields = ["username", "email", "password"]
 
     def create(self, validated_data):
         password = validated_data.pop("password")
-        user = User(**validated_data)
-        user.set_password(password)  # <-- ensures password is hashed
+        user = User(**validated_data, role=User.CUSTOMER)  # Force role to CUSTOMER
+        user.set_password(password)
         user.save()
         return user
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True, min_length=8)
 
 # -------------------- CATEGORY --------------------
 class CategorySerializer(serializers.ModelSerializer):
@@ -66,11 +66,14 @@ class DesignerSerializer(serializers.ModelSerializer):
 class AppointmentSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     designer = DesignerSerializer(read_only=True)
+    designer_id = serializers.PrimaryKeyRelatedField(
+        queryset=Designer.objects.all(), write_only=True, source='designer'
+    )
 
     class Meta:
         model = Appointment
-        fields = ['id', 'user', 'designer', 'appointment_date', 'notes', 'created_at']
-        read_only_fields = ['id', 'created_at']
+        fields = ['id', 'user', 'designer', 'designer_id', 'appointment_date', 'notes', 'created_at']
+        read_only_fields = ['id', 'created_at', 'user']
 
 # -------------------- CART ITEM --------------------
 class CartItemSerializer(serializers.ModelSerializer):
@@ -135,6 +138,7 @@ class OrderSerializer(serializers.ModelSerializer):
         order.total_price = total_price
         order.save()
         return order
+
 # -------------------- REVIEW --------------------
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
