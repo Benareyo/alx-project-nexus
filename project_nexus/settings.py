@@ -17,11 +17,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY
 # ---------------------------------------------------------------------
 SECRET_KEY = config("SECRET_KEY", default="django-insecure-default-key")
-
-# Set DEBUG from environment; default to False in production
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-# Include Render URL in ALLOWED_HOSTS for deployment
 ALLOWED_HOSTS = [h.strip() for h in config(
     "ALLOWED_HOSTS",
     default="127.0.0.1,localhost,bridal-backend-ixf1.onrender.com"
@@ -88,22 +85,11 @@ TEMPLATES = [
 WSGI_APPLICATION = "project_nexus.wsgi.application"
 
 # ---------------------------------------------------------------------
-# DATABASE
+# DATABASES
 # ---------------------------------------------------------------------
-DATABASES = {
-    "default": dj_database_url.parse(
-        config("DATABASE_URL", default=f"sqlite:///{BASE_DIR}/db.sqlite3"),
-        conn_max_age=600,
-        ssl_require=False,
-    )
-}
-
-# -----------------------------------------------------------------
-# DATABASES (robust MySQL URL builder)
-# -----------------------------------------------------------------
 def build_mysql_url_from_env():
     user = config("MYSQL_USER", default=None)
-    db   = config("MYSQL_DB", default=None)
+    db = config("MYSQL_DB", default=None)
     if not (user and db):
         return None
     password = quote_plus(config("MYSQL_PASSWORD", default=""))
@@ -112,20 +98,13 @@ def build_mysql_url_from_env():
     return f"mysql://{user}:{password}@{host}:{port}/{db}"
 
 db_url = config("DATABASE_URL", default=f"sqlite:///{BASE_DIR}/db.sqlite3")
-if not db_url:
+
+if not db_url or db_url.startswith("sqlite:///") and config("MYSQL_USER", default=None):
     db_url = build_mysql_url_from_env()
 
-if db_url:
-    DATABASES = {
-        "default": dj_database_url.parse(db_url, conn_max_age=600, ssl_require=False)
-    }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+DATABASES = {
+    "default": dj_database_url.parse(db_url, conn_max_age=600, ssl_require=False)
+}
 
 # ---------------------------------------------------------------------
 # PASSWORD VALIDATORS
@@ -150,15 +129,11 @@ USE_TZ = True
 # ---------------------------------------------------------------------
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
-# Ensure this directory exists or remove it if unused
 STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
-
-# WhiteNoise (optional compression for static files)
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # ---------------------------------------------------------------------
 # REST FRAMEWORK
@@ -191,7 +166,7 @@ SWAGGER_SETTINGS = {
 CORS_ALLOW_ALL_ORIGINS = True
 
 # ---------------------------------------------------------------------
-# CELERY (optional)
+# CELERY
 # ---------------------------------------------------------------------
 CELERY_BROKER_URL = config("CELERY_BROKER_URL", default="redis://localhost:6379/0")
 CELERY_ACCEPT_CONTENT = ["json"]
@@ -209,7 +184,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "bridal_api.User"
 
 # ---------------------------------------------------------------------
-# SECURITY ENHANCEMENTS (optional but recommended)
+# SECURITY ENHANCEMENTS
 # ---------------------------------------------------------------------
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
@@ -218,4 +193,5 @@ if not DEBUG:
 
 CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:8000",
+    "https://bridal-backend-ixf1.onrender.com",
 ]
