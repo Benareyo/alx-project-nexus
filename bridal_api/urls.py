@@ -1,40 +1,39 @@
-# bridal_api/urls.py
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import (
-    UserViewSet, CategoryViewSet, ProductViewSet,
-    CollectionViewSet, DesignerViewSet, AppointmentViewSet,
-    CartViewSet, CartItemViewSet, OrderViewSet, OrderItemViewSet,
-    ReviewListCreateView, InitiatePaymentView, VerifyPaymentView
+    UserViewSet, RegisterView, LoginView, LogoutView, ChangePasswordView,
+    CategoryViewSet, ProductViewSet, CollectionViewSet, DesignerViewSet,
+    AppointmentViewSet, CartViewSet, CartItemViewSet, OrderViewSet,
+    OrderItemViewSet, ReviewListCreateView, InitiatePaymentView, VerifyPaymentView
 )
 
-# -------------------- DRF Router --------------------
+# DRF router
 router = DefaultRouter()
-router.register(r'users', UserViewSet, basename='users')
-router.register(r'categories', CategoryViewSet, basename='categories')
-router.register(r'products', ProductViewSet, basename='products')
-router.register(r'collections', CollectionViewSet, basename='collections')
-router.register(r'designers', DesignerViewSet, basename='designers')
-router.register(r'appointments', AppointmentViewSet, basename='appointments')
-router.register(r'carts', CartViewSet, basename='carts')
-router.register(r'cart-items', CartItemViewSet, basename='cart-items')
-router.register(r'orders', OrderViewSet, basename='orders')
-router.register(r'order-items', OrderItemViewSet, basename='order-items')
+router.register(r'users', UserViewSet, basename='user')
+router.register(r'categories', CategoryViewSet, basename='category')
+router.register(r'products', ProductViewSet, basename='product')
+router.register(r'collections', CollectionViewSet, basename='collection')
+router.register(r'designers', DesignerViewSet, basename='designer')
+router.register(r'appointments', AppointmentViewSet, basename='appointment')
+router.register(r'carts', CartViewSet, basename='cart')
+router.register(r'cart-items', CartItemViewSet, basename='cartitem')
+router.register(r'orders', OrderViewSet, basename='order')
+router.register(r'order-items', OrderItemViewSet, basename='orderitem')
 
-# -------------------- URL Patterns --------------------
 urlpatterns = [
-    # DRF ViewSets
+    # DRF router URLs
     path('', include(router.urls)),
 
-    # Reviews (APIView)
-    path("reviews/", ReviewListCreateView.as_view(), name="reviews"),
+    # -------------------- AUTH --------------------
+    path('auth/register/', RegisterView.as_view(), name='register'),
+    path('auth/login/', LoginView.as_view(), name='login'),
+    path('auth/logout/', LogoutView.as_view(), name='logout'),
+    path('auth/change-password/', ChangePasswordView.as_view(), name='change-password'),
 
-    # Payment endpoints
-    path("payments/initiate/", InitiatePaymentView.as_view(), name="initiate-payment"),
-    path("payments/verify/", VerifyPaymentView.as_view(), name="verify-payment"),
+    # -------------------- REVIEW --------------------
+    path('reviews/', ReviewListCreateView.as_view(), name='review-list-create'),
 
-    # JWT Authentication
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # -------------------- PAYMENT --------------------
+    path('payments/initiate/', InitiatePaymentView.as_view(), name='initiate-payment'),
+    path('payments/verify/', VerifyPaymentView.as_view(), name='verify-payment'),
 ]
