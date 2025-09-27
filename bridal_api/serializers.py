@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import (
     User, Category, Product, Collection, Designer, Appointment,
-    Cart, CartItem, Order, OrderItem
+    Cart, CartItem, Order, OrderItem, Review
 )
 
 # -------------------- USER --------------------
@@ -135,3 +135,9 @@ class OrderSerializer(serializers.ModelSerializer):
         order.total_price = total_price
         order.save()
         return order
+# -------------------- REVIEW --------------------
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = "__all__"
+        read_only_fields = ("user", "created_at")

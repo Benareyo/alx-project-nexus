@@ -1,6 +1,11 @@
 from rest_framework import viewsets, filters, status
 from rest_framework.decorators import action
+import requests, os
+from rest_framework.views import APIView
+from .models import Payment
 from rest_framework.response import Response
+from rest_framework import generics
+from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -9,13 +14,13 @@ from drf_yasg import openapi
 
 from .models import (
     User, Category, Product, Collection, Designer, Appointment,
-    Cart, CartItem, Order, OrderItem
+    Cart, CartItem, Order, OrderItem, Review
 )
 from .serializers import (
     UserSerializer, UserRegisterSerializer, CategorySerializer,
     ProductSerializer, CollectionSerializer, DesignerSerializer,
     AppointmentSerializer, CartSerializer, CartItemSerializer,
-    OrderSerializer, OrderItemSerializer
+    OrderSerializer, OrderItemSerializer, ReviewSerializer
 )
 from .pagination import StandardResultsSetPagination
 from .permissions import IsAdmin, IsDesigner, IsAdminOrDesigner, IsOwnerOrAdmin
@@ -185,3 +190,98 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["order", "product"]
     permission_classes = [IsOwnerOrAdmin]
+
+# -------------------- REVIEW --------------------
+class ReviewListCreateView(generics.ListCreateAPIView):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+# -------------------- PAYMENT --------------------
+
+class InitiatePaymentView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'amount': openapi.Schema(type=openapi.TYPE_NUMBER, description='Payment amount')
+            },
+            required=['amount']
+        ),
+        responses={200: openapi.Response('Checkout URL', schema=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={'checkout_url': openapi.Schema(type=openapi.TYPE_STRING)}
+        ))}
+    )
+
+    def post(self, request):
+        amount = request.data.get("amount")
+        if not amount:
+            return Response({"detail": "Amount is required."}, status=400)
+
+        payment = Payment.objects.create(user=request.user, amount=amount)
+
+        headers = {
+            "Authorization": f"Bearer {os.getenv('CHAPA_SECRET_KEY')}",
+            "Content-Type": "application/json"
+        }
+        data = {
+            "amount": str(amount),
+            "currency": "ETB",
+            "tx_ref": str(payment.reference),
+            "callback_url": "http://localhost:8000/api/payments/verify/",
+            "return_url": "http://localhost:8000/payment/success",
+            "customization": {
+                "title": "Bridal Dress Payment",
+                "description": "Payment for bridal dress"
+            }
+        }
+
+        r = requests.post("https://api.chapa.co/v1/transaction/initialize", json=data, headers=headers)
+        res = r.json()
+
+        if res.get("status") == "success":
+            return Response({"checkout_url": res["data"]["checkout_url"]})
+        else:
+            return Response(res, status=400)
+
+
+class VerifyPaymentView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('tx_ref', openapi.IN_QUERY, description="Transaction reference", type=openapi.TYPE_STRING)
+        ],
+        responses={200: 'Payment verified successfully'}
+    )
+    
+    def get(self, request):
+        reference = request.query_params.get("tx_ref")
+        if not reference:
+            return Response({"detail": "Transaction reference is required."}, status=400)
+
+        headers = {
+            "Authorization": f"Bearer {os.getenv('CHAPA_SECRET_KEY')}"
+        }
+
+        r = requests.get(f"https://api.chapa.co/v1/transaction/verify/{reference}", headers=headers)
+        res = r.json()
+
+        if res.get("status") == "success" and res["data"]["status"] == "success":
+            try:
+                payment = Payment.objects.get(reference=reference)
+                payment.status = "successful"
+                payment.save()
+                return Response({"detail": "Payment verified successfully."})
+            except Payment.DoesNotExist:
+                return Response({"detail": "Payment not found."}, status=404)
+        else:
+            return Response({"detail": "Payment verification failed."}, status=400)
