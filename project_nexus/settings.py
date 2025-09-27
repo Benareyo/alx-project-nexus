@@ -4,7 +4,12 @@ from pathlib import Path
 from decouple import config
 import dj_database_url
 from urllib.parse import quote_plus
+from dotenv import load_dotenv
 
+
+load_dotenv()  # load .env
+
+CHAPA_SECRET_KEY = os.getenv("CHASECK_TEST-3HxsoYdRvawroxVQe7AtVjfPylteQkRH")
 # ---------------------------------------------------------------------
 # BASE DIRECTORY
 # ---------------------------------------------------------------------
@@ -14,7 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY
 # ---------------------------------------------------------------------
 SECRET_KEY = config("SECRET_KEY", default="django-insecure-default-key")
-DEBUG = config("DEBUG", default=True, cast=bool)
+DEBUG = config("DEBUG", default=False, cast=bool)
 ALLOWED_HOSTS = [h.strip() for h in config("ALLOWED_HOSTS", default="127.0.0.1,localhost").split(",")if h.strip()]
 
 # ---------------------------------------------------------------------
