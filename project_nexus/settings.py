@@ -151,10 +151,15 @@ REST_FRAMEWORK = {
 
 }
 
+AUTHENTICATION_BACKENDS = [
+    'bridal_api.backends.EmailBackend',  # our custom email backend
+    'django.contrib.auth.backends.ModelBackend',  # fallback
+]
+
 # ---------------------------------------------------------------------
 # TEMPLATES
 # ---------------------------------------------------------------------
-# Templates
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",

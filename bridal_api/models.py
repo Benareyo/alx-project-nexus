@@ -9,14 +9,14 @@ import uuid
 # USER MODEL
 # --------------------------------------
 class User(AbstractUser):
-    email = models.EmailField(unique=True)
-    ROLE_CHOICES = (
-        ("customer", "Customer"),
-        ("designer", "Designer"),
-        ("admin", "Admin"),
-    )
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default="customer")
+    CUSTOMER = 'customer'
+    DESIGNER = 'designer'
+    ROLE_CHOICES = [
+        (CUSTOMER, 'Customer'),
+        (DESIGNER, 'Designer'),
+    ]
 
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=CUSTOMER)
     class Meta:
         indexes = [
             models.Index(fields=["username"]),

@@ -1,13 +1,15 @@
-from rest_framework import viewsets, filters, status, generics, permissions
+from rest_framework import viewsets, filters, status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework_simplejwt.tokens import RefreshToken
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django_filters.rest_framework import DjangoFilterBackend
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
+from django.shortcuts import render
+from django.contrib.auth import authenticate
+
 import requests, os
 
 from .models import (
@@ -15,24 +17,20 @@ from .models import (
     Cart, CartItem, Order, OrderItem, Review, Payment
 )
 from .serializers import (
-    UserSerializer, ChangePasswordSerializer,
-    CategorySerializer, ProductSerializer, CollectionSerializer,
-    DesignerSerializer, AppointmentSerializer, CartSerializer,
-    CartItemSerializer, OrderSerializer, OrderItemSerializer,
+    UserSerializer, RegisterSerializer, LoginSerializer, LogoutSerializer,
+    ChangePasswordSerializer, CategorySerializer, ProductSerializer,
+    CollectionSerializer, DesignerSerializer, AppointmentSerializer,
+    CartSerializer, CartItemSerializer, OrderSerializer, OrderItemSerializer,
     ReviewSerializer
 )
 from .pagination import StandardResultsSetPagination
 from .permissions import IsAdmin, IsDesigner, IsAdminOrDesigner, IsOwnerOrAdmin
-from django.shortcuts import render
-
-
 
 # -------------------- HOME PAGE --------------------
 def home(request):
     return render(request, "bridal_api/home.html")
 
-
-# -------------------- USER CRUD (Admin only) --------------------
+# -------------------- USER CRUD --------------------
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -43,84 +41,55 @@ class UserViewSet(viewsets.ModelViewSet):
     ordering = ["-date_joined"]
     permission_classes = [IsAdmin]
 
-
-# -------- REGISTER --------
+# -------------------- REGISTER --------------------
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
-    @swagger_auto_schema(
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                "username": openapi.Schema(type=openapi.TYPE_STRING),
-                "email": openapi.Schema(type=openapi.TYPE_STRING),
-                "password": openapi.Schema(type=openapi.TYPE_STRING),
-            },
-            required=["username", "email", "password"]
-        )
-    )
+    @swagger_auto_schema(request_body=RegisterSerializer)
     def post(self, request):
-        username = request.data.get("username")
-        email = request.data.get("email")
-        password = request.data.get("password")
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                "user": UserSerializer(user).data,
+                "refresh": str(refresh),
+                "access": str(refresh.access_token)
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        if not username or not email or not password:
-            return Response({"detail": "All fields are required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if User.objects.filter(email=email).exists():
-            return Response({"detail": "Email already registered"}, status=status.HTTP_400_BAD_REQUEST)
-
-        user = User.objects.create_user(username=username, email=email, password=password)
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            "user": UserSerializer(user).data,
-            "refresh": str(refresh),
-            "access": str(refresh.access_token)
-        }, status=status.HTTP_201_CREATED)
-
-
-# -------- LOGIN --------
+# -------------------- LOGIN --------------------
 class LoginView(APIView):
     permission_classes = [AllowAny]
 
-    @swagger_auto_schema(
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                'email': openapi.Schema(type=openapi.TYPE_STRING),
-                'password': openapi.Schema(type=openapi.TYPE_STRING)
-            },
-            required=['email', 'password']
-        )
-    )
+    @swagger_auto_schema(request_body=LoginSerializer)
     def post(self, request):
-        email = request.data.get("email")
-        password = request.data.get("password")
-        if not email or not password:
-            return Response({"detail": "Email and password required."}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return Response({"detail": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
-        if not user.check_password(password):
-            return Response({"detail": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),
-            "role": user.role
-        })
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data['user']
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "role": user.role,
+                },
+                "refresh": str(refresh),
+                "access": str(refresh.access_token)
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
 
-
-# -------- LOGOUT --------
+# -------------------- LOGOUT --------------------
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(request_body=LogoutSerializer)
     def post(self, request):
+        # Optional: blacklist the refresh token here if using JWT
         return Response({"status": "Logged out successfully"}, status=status.HTTP_200_OK)
 
-
-# -------- CHANGE PASSWORD --------
+# -------------------- CHANGE PASSWORD --------------------
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -138,7 +107,6 @@ class ChangePasswordView(APIView):
             return Response({"status": "Password changed successfully"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 # -------------------- CATEGORY --------------------
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
@@ -149,7 +117,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
     ordering_fields = ["name", "created_at"]
     ordering = ["name"]
     permission_classes = [IsAdminOrDesigner]
-
 
 # -------------------- PRODUCT --------------------
 class ProductViewSet(viewsets.ModelViewSet):
@@ -163,7 +130,6 @@ class ProductViewSet(viewsets.ModelViewSet):
     ordering = ["-created_at"]
     permission_classes = [IsAdminOrDesigner]
 
-
 # -------------------- COLLECTION --------------------
 class CollectionViewSet(viewsets.ModelViewSet):
     queryset = Collection.objects.all()
@@ -175,7 +141,6 @@ class CollectionViewSet(viewsets.ModelViewSet):
     ordering = ["name"]
     permission_classes = [IsAdminOrDesigner]
 
-
 # -------------------- DESIGNER --------------------
 class DesignerViewSet(viewsets.ModelViewSet):
     queryset = Designer.objects.all()
@@ -183,15 +148,10 @@ class DesignerViewSet(viewsets.ModelViewSet):
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsAdmin]
 
-    @swagger_auto_schema(
-        request_body=DesignerSerializer,
-        responses={201: DesignerSerializer}
-    )
     def create(self, request, *args, **kwargs):
         if not request.user.role == "admin":
             raise PermissionDenied("Only admins can register designers.")
         return super().create(request, *args, **kwargs)
-
 
 # -------------------- APPOINTMENT --------------------
 class AppointmentViewSet(viewsets.ModelViewSet):
@@ -204,14 +164,12 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     ordering = ["-appointment_date"]
     permission_classes = [IsOwnerOrAdmin]
 
-
 # -------------------- CART --------------------
 class CartViewSet(viewsets.ModelViewSet):
     queryset = Cart.objects.all()
     serializer_class = CartSerializer
     pagination_class = StandardResultsSetPagination
     permission_classes = [IsOwnerOrAdmin]
-
 
 # -------------------- CART ITEM --------------------
 class CartItemViewSet(viewsets.ModelViewSet):
@@ -221,7 +179,6 @@ class CartItemViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["cart", "product"]
     permission_classes = [IsOwnerOrAdmin]
-
 
 # -------------------- ORDER --------------------
 class OrderViewSet(viewsets.ModelViewSet):
@@ -234,7 +191,6 @@ class OrderViewSet(viewsets.ModelViewSet):
     ordering = ["-created_at"]
     permission_classes = [IsOwnerOrAdmin]
 
-
 # -------------------- ORDER ITEM --------------------
 class OrderItemViewSet(viewsets.ModelViewSet):
     queryset = OrderItem.objects.all()
@@ -244,16 +200,14 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     filterset_fields = ["order", "product"]
     permission_classes = [IsOwnerOrAdmin]
 
-
 # -------------------- REVIEW --------------------
 class ReviewListCreateView(generics.ListCreateAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
 
 # -------------------- PAYMENT --------------------
 class InitiatePaymentView(APIView):
@@ -289,7 +243,6 @@ class InitiatePaymentView(APIView):
         if res.get("status") == "success":
             return Response({"checkout_url": res["data"]["checkout_url"]})
         return Response(res, status=400)
-
 
 class VerifyPaymentView(APIView):
     permission_classes = [IsAuthenticated]

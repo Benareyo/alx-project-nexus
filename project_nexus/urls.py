@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include, re_path
 from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse
 from bridal_api.views import home  
 
 # JWT
@@ -30,10 +29,10 @@ urlpatterns = [
     # Admin
     path('admin/', admin.site.urls),
 
-    # Root home page
+    # Home page
     path('', home, name='home'),
 
-    # API
+    # API routes
     path('api/', include('bridal_api.urls')),
 
     # JWT Auth
