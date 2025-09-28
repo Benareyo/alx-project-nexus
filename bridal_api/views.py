@@ -23,35 +23,13 @@ from .serializers import (
 )
 from .pagination import StandardResultsSetPagination
 from .permissions import IsAdmin, IsDesigner, IsAdminOrDesigner, IsOwnerOrAdmin
+from django.shortcuts import render
+
+
 
 # -------------------- HOME PAGE --------------------
 def home(request):
-    html_content = """
-    <html>
-        <head>
-            <title>Benareyo Bridal API</title>
-            <style>
-                body { font-family: Arial, sans-serif; text-align: center; background-color: #fff0f5; margin: 0; padding: 0; }
-                .container { padding: 50px; }
-                h1 { color: #d63384; font-size: 3em; margin-bottom: 20px; }
-                p { font-size: 1.2em; color: #555; }
-                img { max-width: 600px; width: 80%; border-radius: 15px; margin-top: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-                a { display: inline-block; margin-top: 20px; font-size: 1.2em; text-decoration: none; color: white; background-color: #d63384; padding: 10px 20px; border-radius: 8px; }
-                a:hover { background-color: #c02677; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>Welcome to Benareyo Bridal 🎉</h1>
-                <p>Your ultimate API for bridal collections, designers, and appointments.</p>
-                <img src="https://images.unsplash.com/photo-1600180758895-9b8a9f78827b?auto=format&fit=crop&w=800&q=80" alt="Bridal">
-                <br>
-                <a href="/swagger/">Explore API Docs</a>
-            </div>
-        </body>
-    </html>
-    """
-    return HttpResponse(html_content)
+    return render(request, "bridal_api/home.html")
 
 
 # -------------------- USER CRUD (Admin only) --------------------

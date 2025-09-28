@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     # Your apps
     "bridal_api",
 ]
-
+DEBUG = True 
 # ---------------------------------------------------------------------
 # MIDDLEWARE
 # ---------------------------------------------------------------------
@@ -129,7 +129,9 @@ USE_TZ = True
 # ---------------------------------------------------------------------
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "bridal_api/static"),
+]
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = "/media/"
@@ -148,6 +150,32 @@ REST_FRAMEWORK = {
     "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"]
 
 }
+
+# ---------------------------------------------------------------------
+# TEMPLATES
+# ---------------------------------------------------------------------
+# Templates
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [ BASE_DIR / "bridal_api" / "templates" ],   
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+            ],
+        },
+    },
+]
+
+# Static
+STATIC_URL = "/static/"
+STATICFILES_DIRS = [ BASE_DIR / "bridal_api" / "static" ]   
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 # ---------------------------------------------------------------------
 # SWAGGER
