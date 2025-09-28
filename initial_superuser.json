@@ -1,0 +1,401 @@
+[
+{
+  "model": "bridal_api.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$TN9ljXZwBF6NJrufUe3xys$0tWApqR2XAQYdTNUVX/U4/E8EHBWjnJW/1D/AqORTCk=",
+    "last_login": "2025-09-26T07:24:38.529Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "email": "lovely@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-09-26T07:24:21.417Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$XhEupVkACawDyDd8SeGeij$bLBe75vleT7pXvz6xBk7nqyKZVcHO2HABEAfNDYjtb8=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "Testuser",
+    "first_name": "",
+    "last_name": "",
+    "email": "test@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-26T07:33:31.209Z",
+    "role": "designer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 3,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$EpI9rCZkrfnz6EgykwG2ji$eNoQlnDuaoKcI8ZkoBJLDfxGOYos/XuYQffRIY5c4ag=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "betel",
+    "first_name": "",
+    "last_name": "",
+    "email": "betel@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-26T08:16:22.675Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 4,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$smNAWHWZ3Esz80pn2uPmst$p3rd38sQISUW+qmkUDDLSFzGpqfWENpnIlC858qSSAI=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "user123",
+    "first_name": "",
+    "last_name": "",
+    "email": "user@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-26T08:49:38.311Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 5,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$yP2r2VN5JvSTZ7cCAA2z4n$ZN8EhgkOQWxwXU8qt6shSy53+CokYfYOzz6FxBuO5m4=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "nardi",
+    "first_name": "",
+    "last_name": "",
+    "email": "nardi@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-27T12:47:25.993Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 6,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$AUVoxAjqW6kJV2deHDF7C8$DAXIC/8e5OyaMhG7Qe9WtnXpUeuRT6QQP68xOS8tlac=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "yellow",
+    "first_name": "",
+    "last_name": "",
+    "email": "yellow@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-27T12:52:37.175Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 7,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$4rYr7zWaeMH1DhsrxjdWxh$s/c9EyWufDyUAfJKf7Oml+xNay3BnQl31JcFEJg2XGo=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "testuser1",
+    "first_name": "",
+    "last_name": "",
+    "email": "testuser1@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-27T15:01:08.903Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 8,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$o1yfQ8pihN49ivkfGYcG2l$psDdlTtPHO3Inw/VOmCSWMygqUtH9+Wof204mfKiaEo=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "Naredos",
+    "first_name": "",
+    "last_name": "",
+    "email": "nardos@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-09-27T21:28:43.645Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 9,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$vGgM1tT6xIm53nvzV6rvC5$BDmRkM5Btcw7graYNhOsEP3k/GuELF78TTy0U3zvxtM=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "nardos",
+    "first_name": "",
+    "last_name": "",
+    "email": "nardos2@gmail.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-27T21:29:55.292Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 10,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$XUElDPzDrFLvwOMaZ6RIql$YC1EUhZynVHdNz8L3IOJC1Fb5E3CR8eSAxlX3/GKhY0=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "nani",
+    "first_name": "",
+    "last_name": "",
+    "email": "nani@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-28T07:18:50.339Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 11,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$2tZK1CJBbAIaCxAU8Lv8SR$ElFtmG5753fKOhhfboA0mbSL0Zouv/pDGLeoIgcvnrQ=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "nunu",
+    "first_name": "",
+    "last_name": "",
+    "email": "nunu@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-28T07:43:23.304Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 12,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$FnTod0ZR0WtJouxR4UOeaE$QlQFTQyX9AdZbwp4RSqKdthxCkDbr006J3Wi9W1jhDA=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "nini",
+    "first_name": "",
+    "last_name": "",
+    "email": "nini@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-28T08:42:31.535Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 13,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$lEpRi6JJYFNK7aH2qqW2tZ$b+MCh4AsoFKaC4Y0QFLeCW1GzGtaenIQzLmYqpGDFEw=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "admin2",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin2@example.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-09-28T09:13:43.031Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 14,
+  "fields": {
+    "password": "",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "lulu",
+    "first_name": "",
+    "last_name": "",
+    "email": "lulu@example.com",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2025-09-28T09:19:04.469Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 15,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$Zun0I1XIgH11kFRFUMX1lj$pZETGIqUvFBAq8tsWztcW8oJ9eYWGmoXk/2OWscLVWQ=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "redu",
+    "first_name": "",
+    "last_name": "",
+    "email": "redu@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-09-28T12:14:41.584Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 16,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$PfK0KvUWyMqxp4eJiRQVek$AJifY1U1RNokGCnlyPlO2C+CX7CT36DxEZ15YDe4j0M=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "admin3",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin3@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-09-28T12:40:18.518Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 17,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$fIrZzsy3ad0sJPf9m3pEbB$QLsmT7z4vIdcaeDbQTlCm29iv+hqS/oGwjfZynsVvYo=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "melat",
+    "first_name": "",
+    "last_name": "",
+    "email": "melat@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-09-28T12:42:18.935Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 18,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$l20XVPT8T6mJSQgQaBWyy9$he/oO7AHfGunjpZLjITM8ln9l5cgVUqxb0I8KlkAdVw=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "Benareyo",
+    "first_name": "",
+    "last_name": "",
+    "email": "ben@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-09-28T12:50:11.318Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 19,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$vFaP7GgEbH5R57hQYyKGVx$9wwZuRyb05FMCQexDtdjn2+tpv+pMZYWx7hBAZRTn68=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "Admin4",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin4@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-09-28T12:52:50.988Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 20,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$djH4THv6WU91PnpoWh09t9$mtcn4qHOdbxUAR/Nj5zDRoBLcJcaERKCfnxZAiLQV9k=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "emuka",
+    "first_name": "",
+    "last_name": "",
+    "email": "admin@example.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-09-28T13:02:24.538Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "bridal_api.user",
+  "pk": 21,
+  "fields": {
+    "password": "pbkdf2_sha256$1000000$w5JgbUwFN92yPMc0KnYiWW$ZxgZNEFMRb2IAVffNAMAuvfmc6TIfvGrCV8MyWv+WMs=",
+    "last_login": null,
+    "is_superuser": true,
+    "username": "emu",
+    "first_name": "",
+    "last_name": "",
+    "email": "enate@gmail.com",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2025-09-28T14:00:14.615Z",
+    "role": "customer",
+    "groups": [],
+    "user_permissions": []
+  }
+}
+]
